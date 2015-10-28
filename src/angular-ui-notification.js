@@ -23,7 +23,6 @@ angular.module('ui-notification').provider('Notification', function() {
     this.$get = function($timeout, $http, $compile, $templateCache, $rootScope, $injector, $sce, $q, $window) {
         var options = this.options;
 
-        var container = options.container;
         var startTop = options.startTop;
         var startRight = options.startRight;
         var verticalSpacing = options.verticalSpacing;
@@ -32,10 +31,6 @@ angular.module('ui-notification').provider('Notification', function() {
 
         var messageElements = [];
         var isResizeBound = false;
-
-        if (typeof container === 'string') {
-          container = document.querySelector(container);
-        }
 
         var notify = function(args, t){
             var deferred = $q.defer();
@@ -51,6 +46,11 @@ angular.module('ui-notification').provider('Notification', function() {
             args.positionY = args.positionY ? args.positionY : options.positionY;
             args.positionX = args.positionX ? args.positionX : options.positionX;
             args.replaceMessage = args.replaceMessage ? args.replaceMessage : options.replaceMessage;
+            args.container = args.container ? args.container : options.container;
+
+            if (typeof args.container === 'string') {
+              args.container = document.querySelector(args.container);
+            }
 
             $http.get(args.template,{cache: $templateCache}).success(function(template) {
 
@@ -116,7 +116,7 @@ angular.module('ui-notification').provider('Notification', function() {
                     }, args.delay);
                 }
 
-                angular.element(container).append(templateElement);
+                angular.element(args.container).append(templateElement);
                 var offset = -(parseInt(templateElement[0].offsetHeight) + 50);
                 templateElement.css(templateElement._positionY, offset + "px");
                 messageElements.push(templateElement);
